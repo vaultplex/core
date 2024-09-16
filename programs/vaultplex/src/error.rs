@@ -1,0 +1,19 @@
+use anchor_lang::prelude::*;
+
+#[error_code]
+pub enum VaultError {
+    #[msg("Unauthorized access to lock or unlock the vault")]
+    Unauthorized,
+    #[msg("The vault is currently locked")]
+    VaultLocked,
+    #[msg("The vault operation just overflowed")]
+    Overflow,
+    #[msg("The vault is closed for deposits at the current slot")]
+    VaultClosedForDeposits,
+    #[msg("Extension not found in the vault data")]
+    ExtensionNotFound,
+    #[msg("Writing in Extension failed. No offset found")]
+    ExtensionOffsetFailed,
+    #[msg("That instruction is not supported for the current Vault Type")]
+    WrongType
+}
