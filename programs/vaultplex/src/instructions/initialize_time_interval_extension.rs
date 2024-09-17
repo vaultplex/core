@@ -1,4 +1,4 @@
-use anchor_lang::prelude::*;
+/* use anchor_lang::prelude::*;
 use crate::{state::*, ExtensionType, TimeIntervalExtension};  // Import state definitions
 
 #[derive(Accounts)]
@@ -25,3 +25,4 @@ pub fn initialize_time_interval_extension(ctx: Context<InitializeTimeIntervalExt
     vault.write_extension(ExtensionType::TimeIntervalExtension, &time_interval_extension)?;
     Ok(())
 }
+ */

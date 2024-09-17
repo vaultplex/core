@@ -10,9 +10,6 @@ pub struct InitializeLockExtension<'info> {
     #[account(
         mut,
         has_one = authority,
-        realloc = Vault::total_size(LockExtension::SIZE), // Reallocate space for the lock extension
-        realloc::zero = true, 
-        realloc::payer = authority,
     )]
     pub vault: Account<'info, Vault>,
 
@@ -23,6 +20,11 @@ impl<'info> InitializeLockExtension<'info> {
     pub fn initialize_lock_extension(&mut self, lock_authority: Pubkey) -> Result<()> {
         let lock_extension = LockExtension::new(lock_authority);
 
-        self.vault.write_extension(ExtensionType::LockExtension, &lock_extension)    
+        // Create a binding to extend the lifetime of the mutable reference
+        let vault_account_info = self.vault.to_account_info();
+        let vault_data = &mut vault_account_info.data.borrow_mut();
+
+        // Write the lock extension to the vault's predefined slot for LockExtension
+        Vault::write_extension(vault_data, ExtensionType::LockExtension, &lock_extension)
     }
 }

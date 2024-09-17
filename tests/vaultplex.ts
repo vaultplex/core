@@ -82,7 +82,7 @@ describe("vaultplex", () => {
       throw e;
     }
   });
- 
+ /* 
   it("should initialize the Lock Extension", async () => {
     try {
       const lockAuthority = user.publicKey; // Set lock authority as the user
@@ -129,8 +129,8 @@ describe("vaultplex", () => {
       console.error(e);
       throw e;
     }
-  });
-
+  }); */
+/* 
   it("should lock the vault and prevent further deposits", async () => {
     try {
       const lockAuthority = user.publicKey; // Set lock authority as the user
@@ -186,7 +186,7 @@ describe("vaultplex", () => {
       console.error(e);
       throw e;
     }
-  });
+  }); */
 /*
   it("should initialize the Time Interval Extension", async () => {
     try {

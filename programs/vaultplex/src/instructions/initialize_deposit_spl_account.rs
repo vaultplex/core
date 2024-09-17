@@ -1,4 +1,4 @@
-use anchor_lang::prelude::*;
+/* use anchor_lang::prelude::*;
 use anchor_spl::associated_token::AssociatedToken;
 use anchor_spl::token::{Token, TokenAccount, Mint};
 
@@ -28,7 +28,7 @@ pub struct InitializeDepositSplAccount<'info> {
         constraint = vault.vault_type == VaultType::SOL,  // Only for SOL vaults
         bump,
     )]
-    /* pub deposit_account_spl: Account<'info, VaultDeposit>,  // System account PDA for SOL deposits
- */
+     pub deposit_account_spl: Account<'info, VaultDeposit>,  // System account PDA for SOL deposits
+ 
 
-}
+} */

@@ -1,5 +1,7 @@
 use anchor_lang::prelude::*;
 
+pub const TIME_INTERVAL_EXTENSION_SIZE: usize = 16; // u64 (8) + u64 (8)
+
 // Time Interval Extension Definition
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct TimeIntervalExtension {
@@ -8,7 +10,7 @@ pub struct TimeIntervalExtension {
 }
 
 impl TimeIntervalExtension {
-    pub const SIZE: usize = 8 + 8; // Size of the extension: start_slot (8 bytes) + end_slot (8 bytes)
+    pub const SIZE: usize = TIME_INTERVAL_EXTENSION_SIZE; // Size of the extension: start_slot (8 bytes) + end_slot (8 bytes)
 
     pub fn new(start_slot: u64, end_slot: u64) -> Self {
         Self { start_slot, end_slot }

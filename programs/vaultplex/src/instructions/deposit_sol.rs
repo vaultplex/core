@@ -1,4 +1,4 @@
-use anchor_lang::prelude::*;
+/* use anchor_lang::prelude::*;
 use anchor_lang::system_program::{transfer, Transfer};
 
 use crate::error::VaultError;
@@ -66,7 +66,7 @@ impl<'info> DepositSol<'info> {
         Ok(())
     }
 }
-/* 
+
     let vault = &ctx.accounts.vault;
     let depositor = &ctx.accounts.depositor;
     let deposit_account = &mut ctx.accounts.deposit_account;
@@ -105,9 +105,9 @@ impl<'info> DepositSol<'info> {
         .ok_or(VaultError::Overflow)?;  // Ensure no overflow occurs
 
     Ok(())
-} */
+}
 
-/* #[derive(Accounts)]
+ #[derive(Accounts)]
 #[instruction(seed: u64)]
 pub struct DepositSol<'info> {
     #[account(mut)]
@@ -137,9 +137,9 @@ impl<'info> Deposit<'info> {
 
         Ok(())
     }
-} */
+}
 
-/* 
+
 pub fn deposit(ctx: Context<Deposit>, _seed: u64, amount: u64) -> Result<()> {
     let vault = &ctx.accounts.vault;
 
@@ -164,4 +164,4 @@ pub fn deposit(ctx: Context<Deposit>, _seed: u64, amount: u64) -> Result<()> {
 
     transfer(transfer_ctx, amount)
 }
- */
+ */ 
