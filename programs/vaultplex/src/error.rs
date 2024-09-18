@@ -15,5 +15,7 @@ pub enum VaultError {
     #[msg("Writing in Extension failed. No offset found")]
     ExtensionOffsetFailed,
     #[msg("That instruction is not supported for the current Vault Type")]
-    WrongType
+    WrongType,
+    #[msg("Deserialiasdasd failed")]
+    ExtensionDeserializationFailed
 }

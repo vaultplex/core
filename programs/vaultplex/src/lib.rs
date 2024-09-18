@@ -26,9 +26,17 @@ pub mod vaultplex {
         ctx.accounts.initialize_lock_extension(lock_authority)
     }
 
-    /* pub fn lock_vault(ctx: Context<LockVault>) -> Result<()> {
+    pub fn lock_vault(ctx: Context<LockVault>) -> Result<()> {
         ctx.accounts.lock_vault()
-    } */
+    }
+
+    pub fn unlock_vault(ctx: Context<LockVault>) -> Result<()> {
+        ctx.accounts.unlock_vault()
+    }
+
+    pub fn deposit_sol(ctx: Context<DepositSol>, amount: u64) -> Result<()> {
+        ctx.accounts.deposit_sol(amount)
+    }
 
    /*  pub fn initialize_lock_extension(ctx: Context<InitializeLockExtension>, lock_authority: Pubkey) -> Result<()> {
         instructions::initialize_lock_extension::initialize_lock_extension(ctx, lock_authority)

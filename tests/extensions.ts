@@ -1,20 +1,50 @@
-// tests/extensions.ts
 import { PublicKey } from "@solana/web3.js";
+import * as borsh from "borsh";
 
-// Define LockExtension class to mirror the Rust struct
+// Define the interface for the fields used in LockExtension
+interface LockExtensionFields {
+  lockAuthority: Uint8Array; // PublicKey stored as a Uint8Array
+  isLocked: boolean; // 'isLocked' as a number for serialization
+}
+
+// Define the LockExtension class
 export class LockExtension {
-  lockAuthority: PublicKey;
-  isLocked: boolean;
+  lockAuthority: PublicKey; // Store PublicKey as PublicKey type
+  isLocked: boolean; // Use number for serialization compatibility with `borsh`
 
-  constructor(lockAuthority: PublicKey, isLocked: boolean) {
-    this.lockAuthority = lockAuthority;
-    this.isLocked = isLocked;
+  constructor(fields: { lockAuthority: Uint8Array; isLocked: boolean }) {
+    this.lockAuthority = new PublicKey(fields.lockAuthority); // Convert Uint8Array to PublicKey
+    this.isLocked = fields.isLocked;
   }
 
-  // Deserialize the LockExtension data from a Buffer
+  // Method to deserialize Buffer into LockExtension using Borsh
   static fromBuffer(buffer: Buffer): LockExtension {
-    const lockAuthority = new PublicKey(buffer.slice(0, 32)); // First 32 bytes for the PublicKey
-    const isLocked = buffer[32] === 1; // Next 1 byte for the boolean value
-    return new LockExtension(lockAuthority, isLocked);
+    // Deserialize the buffer using Borsh and the schema
+    const decoded = borsh.deserialize(
+      LockExtensionSchema,
+      buffer
+    ) as LockExtensionFields;
+
+    // Return a new LockExtension instance
+    return new LockExtension(decoded);
+  }
+
+  // Method to serialize LockExtension to Buffer using Borsh
+  static toBuffer(lockExtension: LockExtension): Buffer {
+    // Serialize the object to a buffer
+    return Buffer.from(
+      borsh.serialize(LockExtensionSchema, {
+        lockAuthority: lockExtension.lockAuthority.toBytes(), // Convert PublicKey to Uint8Array for serialization
+        isLocked: lockExtension.isLocked,
+      })
+    );
   }
 }
+
+// Define the schema for LockExtension using Borsh
+const LockExtensionSchema: borsh.Schema = {
+  struct: {
+    lockAuthority: { array: { type: "u8", len: 32 } }, // Fixed 32-byte array
+    isLocked: "bool", // Boolean value stored as u8 (1 byte)
+  },
+};

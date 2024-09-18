@@ -1,8 +1,8 @@
 use anchor_lang::prelude::*;
-use crate::{state::*, ExtensionType, LockExtension};  // Import state definitions
+use crate::{VaultConfig, LockExtension, LOCK_EXTENSION_OFFSET};
 
+// Accounts context for initializing the lock extension
 #[derive(Accounts)]
-#[instruction(lock_authority: Pubkey)]
 pub struct InitializeLockExtension<'info> {
     #[account(mut)]
     pub authority: Signer<'info>, // Vault creator or existing authority
@@ -11,7 +11,7 @@ pub struct InitializeLockExtension<'info> {
         mut,
         has_one = authority,
     )]
-    pub vault: Account<'info, Vault>,
+    pub vault_config: Account<'info, VaultConfig>,
 
     pub system_program: Program<'info, System>,
 }
@@ -20,11 +20,7 @@ impl<'info> InitializeLockExtension<'info> {
     pub fn initialize_lock_extension(&mut self, lock_authority: Pubkey) -> Result<()> {
         let lock_extension = LockExtension::new(lock_authority);
 
-        // Create a binding to extend the lifetime of the mutable reference
-        let vault_account_info = self.vault.to_account_info();
-        let vault_data = &mut vault_account_info.data.borrow_mut();
-
         // Write the lock extension to the vault's predefined slot for LockExtension
-        Vault::write_extension(vault_data, ExtensionType::LockExtension, &lock_extension)
+        self.vault_config.write_extension(LOCK_EXTENSION_OFFSET, &lock_extension)
     }
 }
