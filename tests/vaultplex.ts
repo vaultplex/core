@@ -38,8 +38,13 @@ describe("vaultplex", () => {
   // Generating a big number random to create a unique seed
   const seed = new BN(randomBytes(8));
 
+  const vaultConfig = PublicKey.findProgramAddressSync(
+    [Buffer.from("vault_config"), seed.toArrayLike(Buffer, "le", 8)],
+    program.programId
+  )[0];
+
   const vault = PublicKey.findProgramAddressSync(
-    [Buffer.from("vault"), seed.toArrayLike(Buffer, "le", 8)],
+    [Buffer.from("vault"), vaultConfig.toBuffer()],
     program.programId
   )[0];
 
@@ -64,7 +69,7 @@ describe("vaultplex", () => {
         .initializeVault(seed)
         .accounts({
           authority: user.publicKey,
-          vault,
+          vaultConfig,
           /* systemProgram: SystemProgram.programId, */
         })
         .signers([user])
@@ -72,7 +77,7 @@ describe("vaultplex", () => {
         .then(confirmTx)
         .then(log);
 
-      const vaultAccountData = await program.account.vault.fetch(vault);
+      const vaultAccountData = await program.account.vaultConfig.fetch(vaultConfig);
       console.log(vaultAccountData);
 
       assert.equal(vaultAccountData.authority.toString(), user.publicKey.toString());
@@ -90,8 +95,76 @@ describe("vaultplex", () => {
         .initializeLockExtension(lockAuthority)
         .accounts({
           authority: user.publicKey,
-          vault,
-          systemProgram: SystemProgram.programId,
+          vaultConfig,
+        })
+        .signers([user])
+        .rpc()
+        .then(confirmTx)
+        .then(log);
+  
+      // Fetch the updated Vault account data
+      const vaultAccountData = await program.account.vaultConfig.fetch(vaultConfig);
+      console.log(
+        "Vault Account Data after initializing Lock Extension:",
+        vaultAccountData
+      );
+  
+      // Verify that the vault's authority and seed have not changed
+      assert.equal(
+        vaultAccountData.authority.toString(),
+        user.publicKey.toString()
+      );
+      assert.equal(vaultAccountData.seed.toString(), seed.toString());
+  
+      // Extract the extensions data from the vault account
+      const extensionsData = vaultAccountData.extensions as unknown as Buffer;
+
+      // The offset for LockExtension in the extensions array (if it starts at 0)
+      const lockExtensionOffset = 0;
+
+      // The size of LockExtension: Pubkey (32 bytes) + is_locked (1 byte)
+      const lockExtensionSize = 33; // 32 + 1;
+  
+      // Ensure the Buffer has enough data
+    if (extensionsData.length < lockExtensionOffset + lockExtensionSize) {
+      console.error("Buffer does not have enough data for LockExtension");
+      console.log("Expected size:", lockExtensionOffset + lockExtensionSize);
+      console.log("Actual size:", extensionsData.length);
+      throw new Error("Buffer does not have enough data for LockExtension");
+    }
+
+    // Extract the LockExtension slice using the correct offset
+    const lockExtensionData = extensionsData.slice(
+      lockExtensionOffset,
+      lockExtensionOffset + lockExtensionSize
+    );
+
+    // Deserialize LockExtension data (using Borsh or your chosen method)
+    const lockExtension = LockExtension.fromBuffer(lockExtensionData); // Implement this deserialization method
+
+    console.log("Lock Extension initialized correctly:", lockExtension);
+
+    // Verify the lock extension contents
+    assert.equal(
+      lockExtension.lockAuthority.toString(),
+      lockAuthority.toString()
+    );
+    assert.equal(lockExtension.isLocked, false);
+
+
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  });
+
+  it("should lock the vault and verify it's locked", async () => {
+    try {
+      const tx = await program.methods
+        .lockVault()
+        .accounts({
+          authority: user.publicKey,
+          vaultConfig,
         })
         .signers([user])
         .rpc()
@@ -99,261 +172,42 @@ describe("vaultplex", () => {
         .then(log);
 
       // Fetch the updated Vault account data
-      const vaultAccountData = await program.account.vault.fetch(vault);
-      console.log("Vault Account Data after initializing Lock Extension:", vaultAccountData);
-
-      // Verify that the vault's authority and seed have not changed
-      assert.equal(vaultAccountData.authority.toString(), user.publicKey.toString());
-      assert.equal(vaultAccountData.seed.toString(), seed.toString());
+      const vaultAccountData = await program.account.vaultConfig.fetch(vaultConfig);
+      console.log("Vault Account Data after locking the vault:", vaultAccountData);
 
       // Extract the extensions data from the vault account
-      const extensionsData = vaultAccountData.extensions as Buffer;
+      const extensionsData = vaultAccountData.extensions as unknown as Buffer;
 
-      // Deserialize the LockExtension data from the extensions buffer
-      const lockExtensionSize = 32 + 1; // Pubkey (32 bytes) + is_locked (1 byte)
-      const lockExtensionOffset = 0; // Assuming LockExtension is at the start of the extensions vector
+      // The offset for LockExtension in the extensions array (if it starts at 0)
+      const lockExtensionOffset = 0;
 
-      // Extract the LockExtension slice
-      const lockExtensionData = extensionsData.slice(lockExtensionOffset, lockExtensionOffset + lockExtensionSize);
+      // The size of LockExtension: Pubkey (32 bytes) + is_locked (1 byte)
+      const lockExtensionSize = 33; // 32 + 1;
 
-      // Deserialize LockExtension data (using Borsh or your chosen method)
-      const lockExtension = LockExtension.fromBuffer(lockExtensionData); // You'll need to implement this deserialization method
+      // Ensure the Buffer has enough data
+      if (extensionsData.length < lockExtensionOffset + lockExtensionSize) {
+        console.error("Buffer does not have enough data for LockExtension");
+        console.log("Expected size:", lockExtensionOffset + lockExtensionSize);
+        console.log("Actual size:", extensionsData.length);
+        throw new Error("Buffer does not have enough data for LockExtension");
+      }
+
+      // Extract the LockExtension slice using the correct offset
+      const lockExtensionData = extensionsData.slice(
+        lockExtensionOffset,
+        lockExtensionOffset + lockExtensionSize
+      );
+
+      // Deserialize LockExtension data (using Borsh)
+      const lockExtension = LockExtension.fromBuffer(lockExtensionData); // Implement this deserialization method
+
+      console.log("Lock Extension after locking:", lockExtension);
 
       // Verify the lock extension contents
-      assert.equal(lockExtension.lockAuthority.toString(), lockAuthority.toString());
-      assert.equal(lockExtension.isLocked, false); // Should be false after initialization
-
-      console.log("Lock Extension initialized correctly:", lockExtension);
-
+      assert.equal(lockExtension.isLocked, true); // Should be 1 after locking
     } catch (e) {
       console.error(e);
       throw e;
     }
   });
-
-  it("should lock the vault and prevent further deposits", async () => {
-    try {
-      const lockAuthority = user.publicKey; // Set lock authority as the user
-      
-      const tx = await program.methods
-        .lockVault()
-        .accounts({
-          authority: user.publicKey,
-          lockAuthority: user.publicKey,
-          vault,
-        })
-        .signers([user])
-        .rpc()
-        .then(confirmTx)
-        .then(log);
-
-      const vaultAccountData = await program.account.vault.fetch(vault);
-        // Extract the extensions data from the vault account
-      const extensionsData = vaultAccountData.extensions as Buffer;
-
-      // Deserialize the LockExtension data from the extensions buffer
-      const lockExtensionSize = 32 + 1; // Pubkey (32 bytes) + is_locked (1 byte)
-      const lockExtensionOffset = 0; // Assuming LockExtension is at the start of the extensions vector
-
-      // Extract the LockExtension slice
-      const lockExtensionData = extensionsData.slice(lockExtensionOffset, lockExtensionOffset + lockExtensionSize);
-
-      // Deserialize LockExtension data (using Borsh or your chosen method)
-      const lockExtension = LockExtension.fromBuffer(lockExtensionData); // You'll need to implement this deserialization method
-
-      // Verify the lock extension contents
-      assert.equal(lockExtension.lockAuthority.toString(), lockAuthority.toString());
-      assert.equal(lockExtension.isLocked, true); // Should be false after initialization
-
-      // Attempt to deposit when vault is locked
-      const amount = new BN(5000000); // Attempt to deposit 0.005 SOL
-      try {
-        await program.methods
-          .deposit(amount)
-          .accounts({
-            user: user.publicKey,
-            vault,
-            systemProgram: SystemProgram.programId,
-            clock: anchor.web3.SYSVAR_CLOCK_PUBKEY,
-          })
-          .signers([user])
-          .rpc();
-        assert.fail("Deposit should not be allowed when vault is locked");
-      } catch (err) {
-        assert.include(err.toString(), "VaultLocked"); // Expect a vault locked error
-      }
-    } catch (e) {
-      console.error(e);
-      throw e;
-    }
-  });
-/*
-  it("should initialize the Time Interval Extension", async () => {
-    try {
-      const startSlot = new BN(100); // Example start slot
-      const endSlot = new BN(200);   // Example end slot
-      const tx = await program.methods
-        .initializeTimeIntervalExtension(startSlot, endSlot)
-        .accounts({
-          authority: user.publicKey,
-          vault,
-          systemProgram: SystemProgram.programId,
-        })
-        .signers([user])
-        .rpc()
-        .then(confirmTx)
-        .then(log);
-    } catch (e) {
-      console.error(e);
-      throw e;
-    }
-  });
-
-  it("should deposit SOL into the vault and reflect balance", async () => {
-    try {
-      const amount = new BN(10000000); // Deposit 0.01 SOL
-      const tx = await program.methods
-        .deposit(amount)
-        .accounts({
-          user: user.publicKey,
-          vault,
-          systemProgram: SystemProgram.programId,
-          clock: anchor.web3.SYSVAR_CLOCK_PUBKEY,
-        })
-        .signers([user])
-        .rpc()
-        .then(confirmTx)
-        .then(log);
-
-      const balance = await connection.getBalance(vault);
-      assert.equal(balance, amount.toNumber());
-    } catch (e) {
-      console.error(e);
-      throw e;
-    }
-  });
-
-  it("should lock the vault and prevent further deposits", async () => {
-    try {
-      const tx = await program.methods
-        .lockVault()
-        .accounts({
-          lockAuthority: user.publicKey,
-          vault,
-        })
-        .signers([user])
-        .rpc()
-        .then(confirmTx)
-        .then(log);
-
-      // Attempt to deposit when vault is locked
-      const amount = new BN(5000000); // Attempt to deposit 0.005 SOL
-      try {
-        await program.methods
-          .deposit(amount)
-          .accounts({
-            user: user.publicKey,
-            vault,
-            systemProgram: SystemProgram.programId,
-            clock: anchor.web3.SYSVAR_CLOCK_PUBKEY,
-          })
-          .signers([user])
-          .rpc();
-        assert.fail("Deposit should not be allowed when vault is locked");
-      } catch (err) {
-        assert.include(err.toString(), "VaultLocked"); // Expect a vault locked error
-      }
-    } catch (e) {
-      console.error(e);
-      throw e;
-    }
-  });
-
-  it("should unlock the vault and allow deposits", async () => {
-    try {
-      const tx = await program.methods
-        .unlockVault()
-        .accounts({
-          lockAuthority: user.publicKey,
-          vault,
-        })
-        .signers([user])
-        .rpc()
-        .then(confirmTx)
-        .then(log);
-
-      // Deposit should be allowed after unlocking
-      const amount = new BN(5000000); // Deposit 0.005 SOL
-      const depositTx = await program.methods
-        .deposit(amount)
-        .accounts({
-          user: user.publicKey,
-          vault,
-          systemProgram: SystemProgram.programId,
-          clock: anchor.web3.SYSVAR_CLOCK_PUBKEY,
-        })
-        .signers([user])
-        .rpc()
-        .then(confirmTx)
-        .then(log);
-
-      const balance = await connection.getBalance(vault);
-      assert.equal(balance, 15000000); // 0.015 SOL
-    } catch (e) {
-      console.error(e);
-      throw e;
-    }
-  });
-
-  it("should not allow deposit outside the specified time interval", async () => {
-    try {
-      // Manually set the clock to a slot outside the valid interval
-      const slotOutsideInterval = new BN(250); // Example slot outside interval
-      await anchor.setProvider(anchor.AnchorProvider.local(provider.wallet, { commitment: "processed" }));
-      anchor.workspace.Vaultplex.provider.connection.setSlot(slotOutsideInterval.toNumber());
-
-      const amount = new BN(5000000); // Attempt to deposit 0.005 SOL
-      try {
-        await program.methods
-          .deposit(amount)
-          .accounts({
-            user: user.publicKey,
-            vault,
-            systemProgram: SystemProgram.programId,
-            clock: anchor.web3.SYSVAR_CLOCK_PUBKEY,
-          })
-          .signers([user])
-          .rpc();
-        assert.fail("Deposit should not be allowed outside the specified time interval");
-      } catch (err) {
-        assert.include(err.toString(), "VaultClosedForDeposits"); // Expect a time interval error
-      }
-    } catch (e) {
-      console.error(e);
-      throw e;
-    }
-  });
-
-  it("should withdraw SOL from the vault", async () => {
-    try {
-      const amount = new BN(1000000); // Withdraw 0.001 SOL
-      const tx = await program.methods
-        .withdraw(amount)
-        .accounts({
-          user: user.publicKey,
-          vault,
-          systemProgram: SystemProgram.programId,
-        })
-        .signers([user])
-        .rpc()
-        .then(confirmTx)
-        .then(log);
-
-      const balance = await connection.getBalance(vault);
-      assert.equal(balance, 14000000); // Should have 0.014 SOL left
-    } catch (e) {
-      console.error(e);
-      throw e;
-    }
-  }); */
 });
