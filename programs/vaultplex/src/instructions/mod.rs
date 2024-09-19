@@ -1,3 +1,6 @@
+pub mod initialize_deposit_period_extension;
+pub use initialize_deposit_period_extension::*;
+
 pub mod initialize_lock_extension;
 pub use initialize_lock_extension::*;
 

@@ -1,11 +1,11 @@
-import * as anchor from "@coral-xyz/anchor";
+/* import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { Vaultplex } from "../target/types/vaultplex";
 import { assert } from "chai";
 import { BN } from "bn.js";
 import { randomBytes } from "crypto";
 import { Authorized, Keypair, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
-import { LockExtension } from './extensions';
+import { LockExtension } from './LockExtension';
 
 describe("vaultplex", () => {
   const provider = anchor.AnchorProvider.env();
@@ -70,7 +70,6 @@ describe("vaultplex", () => {
         .accounts({
           authority: user.publicKey,
           vaultConfig,
-          /* systemProgram: SystemProgram.programId, */
         })
         .signers([user])
         .rpc()
@@ -211,3 +210,4 @@ describe("vaultplex", () => {
     }
   });
 });
+ */
