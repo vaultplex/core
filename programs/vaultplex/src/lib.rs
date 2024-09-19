@@ -42,6 +42,7 @@ pub mod vaultplex {
         ctx.accounts.initialize_deposit_period_extension(start_slot, end_slot)
     }
 
+
     pub fn initialize_access_control_extension(ctx: Context<InitializeAccessControlExtension>, access_control_authority: Pubkey, access_control_type: AccessControlType) -> Result<()> {
         ctx.accounts.initialize_access_control_extension(access_control_authority, access_control_type)
     }

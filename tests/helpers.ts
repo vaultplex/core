@@ -9,6 +9,7 @@ import { assert } from "chai";
 import { DepositPeriodExtension } from "./DepositPeriodExtension";
 import { AccessControlExtension, AccessControlType } from "./AccessControlExtension";
 
+
 // Anchor setup
 const provider = anchor.AnchorProvider.env();
 anchor.setProvider(provider);
@@ -176,6 +177,7 @@ export const assertDepositPeriodExtension = (vaultAccountData: any, startSlot: n
     const extension = DepositPeriodExtension.fromBuffer(extensionDataSliced);
     assert.equal(extension.startSlot, startSlot);
     assert.equal(extension.endSlot, endSlot);
+
 };
 
 export const initializeAccessControlExtension = async (
@@ -213,3 +215,4 @@ export const assertAccessControExtension = (vaultAccountData: any, accessControl
     /* TODO: Fix the enum / boolean / private / public 
      assert.equal(extension.accessControlType, accessControlType); */
 };
+

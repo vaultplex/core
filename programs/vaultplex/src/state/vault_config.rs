@@ -8,9 +8,11 @@ pub const LOCK_EXTENSION_OFFSET: usize = 0; // Fixed offset for LockExtension
 pub const LOCK_EXTENSION_SIZE: usize = 34; // Pubkey (32 bytes) + bool (1 byte) + bool (1 byte)
 pub const DEPOSIT_PERIOD_EXTENSION_OFFSET: usize = 35;
 pub const DEPOSIT_PERIOD_EXTENSION_SIZE: usize = 24;
+
 pub const ACCESS_CONTROL_EXTENSION_OFFSET: usize = 60;
 pub const ACCESS_CONTROL_EXTENSION_SIZE: usize = 33;
 pub const TOTAL_EXTENSION_SIZE: usize = ACCESS_CONTROL_EXTENSION_OFFSET + ACCESS_CONTROL_EXTENSION_SIZE;
+
 pub const VAULT_CONFIG_BASE_SIZE: usize = 50; // Account discriminator (8) + authority (32) + seed (8) + bump (1) + vault_bump (1)
 
 // Vault struct with predefined extensions space
