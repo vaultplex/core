@@ -1,9 +1,10 @@
 use anchor_lang::prelude::*;
 
+use borsh::{BorshDeserialize, BorshSerialize};
+
 use crate::error::VaultError;
 
-// Deposit Window Extension Definition
-#[derive(AnchorSerialize, AnchorDeserialize, Default, Clone, Debug)]
+#[derive(BorshSerialize, BorshDeserialize, Default, Clone, Debug)]
 pub struct DepositPeriodExtension {
     pub is_initialized: bool,   // Required to solve the Default issue
     pub start_slot: u64,        // Starting slot for deposits

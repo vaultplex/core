@@ -24,4 +24,6 @@ pub enum VaultError {
     ExtensionDepositPeriodEnded,
     #[msg("Vault deposits extension failed")]
     ExtensionDepositPeriodFailed,
+    #[msg("You don't have permission to deposit into the vault")]
+    ExtensionDepositDenied,
 }

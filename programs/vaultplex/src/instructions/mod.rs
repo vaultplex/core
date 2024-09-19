@@ -1,3 +1,6 @@
+pub mod initialize_access_control_extension;
+pub use initialize_access_control_extension::*;
+
 pub mod initialize_deposit_period_extension;
 pub use initialize_deposit_period_extension::*;
 
