@@ -7,6 +7,7 @@ import { Keypair, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from
 import { LockExtension } from './LockExtension';
 import { assert } from "chai";
 import { DepositPeriodExtension } from "./DepositPeriodExtension";
+import { AccessControlExtension, AccessControlType } from "./AccessControlExtension";
 
 // Anchor setup
 const provider = anchor.AnchorProvider.env();
@@ -175,4 +176,40 @@ export const assertDepositPeriodExtension = (vaultAccountData: any, startSlot: n
     const extension = DepositPeriodExtension.fromBuffer(extensionDataSliced);
     assert.equal(extension.startSlot, startSlot);
     assert.equal(extension.endSlot, endSlot);
+};
+
+export const initializeAccessControlExtension = async (
+    user: Keypair, 
+    vaultConfig: PublicKey, 
+    accessControlAuthority: PublicKey, 
+    accessControlType: { public: {} } | { private: {} }
+) => {
+
+    const tx = await program.methods
+        .initializeAccessControlExtension(accessControlAuthority, accessControlType)
+        .accounts({
+            authority: user.publicKey,
+            vaultConfig,
+        })
+        .signers([user])
+        .rpc()
+        .then(confirmTx)
+        .then(logTx);
+
+    const vaultAccountData = await program.account.vaultConfig.fetch(vaultConfig);
+    return vaultAccountData;
+};
+
+export const assertAccessControExtension = (vaultAccountData: any, accessControlAuthority: PublicKey, accessControlType: boolean ) => {
+    const extensionsData = vaultAccountData.extensions as unknown as Buffer;
+    const extensionOffset = 60;
+    const extensionSize = 33;
+    const extensionDataSliced = extensionsData.slice(
+        extensionOffset,
+        extensionOffset + extensionSize
+    );
+    const extension = AccessControlExtension.fromBuffer(extensionDataSliced);
+    assert.equal(extension.accessControlAuthority.toString(), accessControlAuthority.toString());
+    /* TODO: Fix the enum / boolean / private / public 
+     assert.equal(extension.accessControlType, accessControlType); */
 };

@@ -1,4 +1,4 @@
-use crate::DepositPeriodExtension;
+use crate::{AccessControlExtension, DepositPeriodExtension};
 use crate::{error::VaultError, state::*, LockExtension};
 use anchor_lang::prelude::*;
 use anchor_lang::system_program::{transfer, Transfer};
@@ -34,6 +34,13 @@ impl<'info> DepositSol<'info> {
         {
             // If the extension exists, check if the vault is locked
             lock_extension.check_lock()?; // Vault is locked if `is_locked` is true
+        }
+
+        if let Ok(access_control_extension) =
+            vault_config.read_extension::<AccessControlExtension>(ACCESS_CONTROL_EXTENSION_OFFSET)
+        {
+            // If the extension exists, check if the vault is locked
+            access_control_extension.is_depositor_allowed(&self.user.key())?;
         }
 
         // Get the current slot
