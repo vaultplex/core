@@ -17,5 +17,11 @@ pub enum VaultError {
     #[msg("That instruction is not supported for the current Vault Type")]
     WrongType,
     #[msg("Deserialiasdasd failed")]
-    ExtensionDeserializationFailed
+    ExtensionDeserializationFailed,
+    #[msg("Vault deposits are not yet opened")]
+    ExtensionDepositPeriodNotOpenYet,
+    #[msg("Vault deposits are ended")]
+    ExtensionDepositPeriodEnded,
+    #[msg("Vault deposits extension failed")]
+    ExtensionDepositPeriodFailed,
 }

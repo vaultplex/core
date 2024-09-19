@@ -71,7 +71,6 @@ describe("vaultplex - Lock Extension", () => {
     await depositSol(user, vaultConfig, vault, amount);
 
     const balance = await connection.getBalance(vault);
-    console.log(balance);
-    
+    assert.equal(balance, LAMPORTS_PER_SOL);
   });
 });

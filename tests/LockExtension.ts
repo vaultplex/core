@@ -3,16 +3,19 @@ import * as borsh from "borsh";
 
 // Define the interface for the fields used in LockExtension
 interface LockExtensionFields {
+  isInitialized: boolean;
   lockAuthority: Uint8Array; // PublicKey stored as a Uint8Array
   isLocked: boolean; // 'isLocked' as a number for serialization
 }
 
 // Define the LockExtension class
 export class LockExtension {
+  isInitialized: boolean;
   lockAuthority: PublicKey; // Store PublicKey as PublicKey type
   isLocked: boolean; // Use number for serialization compatibility with `borsh`
 
-  constructor(fields: { lockAuthority: Uint8Array; isLocked: boolean }) {
+  constructor(fields: LockExtensionFields) {
+    this.isInitialized = fields.isInitialized;
     this.lockAuthority = new PublicKey(fields.lockAuthority); // Convert Uint8Array to PublicKey
     this.isLocked = fields.isLocked;
   }
@@ -34,6 +37,7 @@ export class LockExtension {
     // Serialize the object to a buffer
     return Buffer.from(
       borsh.serialize(LockExtensionSchema, {
+        isInitialized: lockExtension.isInitialized,
         lockAuthority: lockExtension.lockAuthority.toBytes(), // Convert PublicKey to Uint8Array for serialization
         isLocked: lockExtension.isLocked,
       })
@@ -44,6 +48,7 @@ export class LockExtension {
 // Define the schema for LockExtension using Borsh
 const LockExtensionSchema: borsh.Schema = {
   struct: {
+    isInitialized: "u8",
     lockAuthority: { array: { type: "u8", len: 32 } }, // Fixed 32-byte array
     isLocked: "bool", // Boolean value stored as u8 (1 byte)
   },

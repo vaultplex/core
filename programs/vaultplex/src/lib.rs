@@ -38,6 +38,10 @@ pub mod vaultplex {
         ctx.accounts.deposit_sol(amount)
     }
 
+    pub fn initialize_deposit_period_extension(ctx: Context<InitializeDepositPeriodExtension>, start_slot: u64, end_slot: u64) -> Result<()> {
+        ctx.accounts.initialize_deposit_period_extension(start_slot, end_slot)
+    }
+
    /*  pub fn initialize_lock_extension(ctx: Context<InitializeLockExtension>, lock_authority: Pubkey) -> Result<()> {
         instructions::initialize_lock_extension::initialize_lock_extension(ctx, lock_authority)
     }

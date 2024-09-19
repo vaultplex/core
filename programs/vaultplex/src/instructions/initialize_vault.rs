@@ -32,7 +32,7 @@ impl<'info> InitializeVault<'info> {
             seed,
             bump: bumps.vault_config,
             vault_bump: bumps.vault,
-            extensions: [0u8; 33],
+            extensions: [0u8; TOTAL_EXTENSION_SIZE],
         });
 
         Ok(())
