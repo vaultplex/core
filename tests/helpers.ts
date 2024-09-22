@@ -8,6 +8,7 @@ import { LockExtension } from './LockExtension';
 import { assert } from "chai";
 import { DepositPeriodExtension } from "./DepositPeriodExtension";
 import { AccessControlExtension, AccessControlType } from "./AccessControlExtension";
+import { FeeExtension } from "./FeeExtension";
 
 
 // Anchor setup
@@ -131,13 +132,14 @@ export const unlockVault = async (user: Keypair, vaultConfig: PublicKey) => {
 };
 
 // Lock the vault
-export const depositSol = async (user: Keypair, vaultConfig: PublicKey, vault: PublicKey, amount: anchor.BN) => {
+export const depositSol = async (user: Keypair, vaultConfig: PublicKey, vault: PublicKey, feeTreasury: PublicKey | null, amount: anchor.BN) => {
     const tx = await program.methods
         .depositSol(amount)
         .accounts({
             user: user.publicKey,
             vaultConfig,
             vault,
+            feeTreasury,
         })
         .signers([user])
         .rpc()
@@ -177,7 +179,6 @@ export const assertDepositPeriodExtension = (vaultAccountData: any, startSlot: n
     const extension = DepositPeriodExtension.fromBuffer(extensionDataSliced);
     assert.equal(extension.startSlot, startSlot);
     assert.equal(extension.endSlot, endSlot);
-
 };
 
 export const initializeAccessControlExtension = async (
@@ -216,3 +217,41 @@ export const assertAccessControExtension = (vaultAccountData: any, accessControl
      assert.equal(extension.accessControlType, accessControlType); */
 };
 
+
+export const initializeFeeExtension = async (
+    user: Keypair, 
+    vaultConfig: PublicKey, 
+    feeAuthority: PublicKey, 
+    feeCollector: PublicKey,
+    depositFeeBasisPoints: number,
+    maxDepositFee: anchor.BN,
+) => {
+
+    const tx = await program.methods
+        .initializeFeeExtension(feeAuthority, feeCollector, depositFeeBasisPoints, maxDepositFee)
+        .accounts({
+            authority: user.publicKey,
+            vaultConfig,
+        })
+        .signers([user])
+        .rpc()
+        .then(confirmTx)
+        .then(logTx);
+
+    const vaultAccountData = await program.account.vaultConfig.fetch(vaultConfig);
+    return vaultAccountData;
+};
+
+export const assertFeeExtension = (vaultAccountData: any, feeAuthority: PublicKey, depositFeeBasisPoints: number, maxDepositFee: anchor.BN,) => {
+    const extensionsData = vaultAccountData.extensions as unknown as Buffer;
+    const extensionOffset = 94;
+    const extensionSize = 48;
+    const extensionDataSliced = extensionsData.slice(
+        extensionOffset,
+        extensionOffset + extensionSize
+    );
+    const extension = FeeExtension.fromBuffer(extensionDataSliced);
+    assert.equal(extension.feeAuthority.toString(), feeAuthority.toString());
+    assert.equal(extension.depositFeeBasisPoints, depositFeeBasisPoints);
+    assert.equal(extension.maxDepositFee, maxDepositFee);
+};

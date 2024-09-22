@@ -6,12 +6,17 @@ use crate::error::VaultError;
 // Constants
 pub const LOCK_EXTENSION_OFFSET: usize = 0; // Fixed offset for LockExtension
 pub const LOCK_EXTENSION_SIZE: usize = 34; // Pubkey (32 bytes) + bool (1 byte) + bool (1 byte)
+
 pub const DEPOSIT_PERIOD_EXTENSION_OFFSET: usize = 35;
 pub const DEPOSIT_PERIOD_EXTENSION_SIZE: usize = 24;
 
 pub const ACCESS_CONTROL_EXTENSION_OFFSET: usize = 60;
 pub const ACCESS_CONTROL_EXTENSION_SIZE: usize = 33;
-pub const TOTAL_EXTENSION_SIZE: usize = ACCESS_CONTROL_EXTENSION_OFFSET + ACCESS_CONTROL_EXTENSION_SIZE;
+
+pub const FEE_EXTENSION_OFFSET: usize = 94;
+pub const FEE_EXTENSION_SIZE: usize = 48;
+
+pub const TOTAL_EXTENSION_SIZE: usize = FEE_EXTENSION_OFFSET + FEE_EXTENSION_SIZE;
 
 pub const VAULT_CONFIG_BASE_SIZE: usize = 50; // Account discriminator (8) + authority (32) + seed (8) + bump (1) + vault_bump (1)
 
@@ -21,7 +26,7 @@ pub struct VaultConfig  {
     pub authority: Pubkey,                     // Authority of the vault
     pub seed: u64,                             // Seed for uniqueness
     pub bump: u8,                              // Bump for the PDA
-    pub vault_bump: u8,
+    pub vault_bump: u8,                        // Bump for the Vault PDA 
     pub extensions: [u8; TOTAL_EXTENSION_SIZE], // Fixed-size array to hold extensions data (adjust size as needed)
 }
 

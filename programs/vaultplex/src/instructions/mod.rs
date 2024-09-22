@@ -4,6 +4,9 @@ pub use initialize_access_control_extension::*;
 pub mod initialize_deposit_period_extension;
 pub use initialize_deposit_period_extension::*;
 
+pub mod initialize_fee_extension;
+pub use initialize_fee_extension::*;
+
 pub mod initialize_lock_extension;
 pub use initialize_lock_extension::*;
 

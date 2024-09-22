@@ -26,4 +26,7 @@ pub enum VaultError {
     ExtensionDepositPeriodFailed,
     #[msg("You don't have permission to deposit into the vault")]
     ExtensionDepositDenied,
+    #[msg("The fee treasury account wasn't provided")]
+    FeeTreasuryNotProvided,
+
 }
