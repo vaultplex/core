@@ -52,7 +52,7 @@ describe("vaultplex - Lock Extension", () => {
   it("should try to deposit while the vault is locked and catch the error", async () => {
     const amount = new BN(LAMPORTS_PER_SOL); // Deposit 1 SOL
     try {
-        await depositSol(user, vaultConfig, vault, amount);
+        await depositSol(user, vaultConfig, vault, null, amount);
 
         assert.fail("Deposit should have failed because the vault is locked");
     } catch (err) {
@@ -68,7 +68,7 @@ describe("vaultplex - Lock Extension", () => {
   it("should deposit some SOL while the vault is unlocked", async () => {
     const amount = new BN(LAMPORTS_PER_SOL); // Deposit 1 SOL
     
-    await depositSol(user, vaultConfig, vault, amount);
+    await depositSol(user, vaultConfig, vault, null, amount);
 
     const balance = await connection.getBalance(vault);
     assert.equal(balance, LAMPORTS_PER_SOL);

@@ -47,7 +47,7 @@ describe("vaultplex - Access Control Extension", () => {
   it("deposit while the vault don't have access control", async () => {
     const amount = new BN(LAMPORTS_PER_SOL); // Deposit 1 SOL
     
-    await depositSol(user, vaultConfig, vault, amount);
+    await depositSol(user, vaultConfig, vault, null, amount);
 
     const balance = await connection.getBalance(vault);
     assert.equal(balance, LAMPORTS_PER_SOL);
@@ -61,7 +61,7 @@ describe("vaultplex - Access Control Extension", () => {
   it("deposit while the vault is public", async () => {
     const amount = new BN(LAMPORTS_PER_SOL); // Deposit 1 SOL
     
-    await depositSol(user, vaultConfig, vault, amount);
+    await depositSol(user, vaultConfig, vault, null, amount);
 
     const balance = await connection.getBalance(vault);
     assert.equal(balance, 2 * LAMPORTS_PER_SOL);
@@ -75,7 +75,7 @@ describe("vaultplex - Access Control Extension", () => {
   it("should try to deposit while the vault is private and catch the error", async () => {
     const amount = new BN(LAMPORTS_PER_SOL); // Deposit 1 SOL
     try {
-        await depositSol(badUser, vaultConfig, vault, amount);
+        await depositSol(badUser, vaultConfig, vault, null, amount);
 
         assert.fail("Deposit should have failed because the vault is private");
     } catch (err) {
@@ -86,7 +86,7 @@ describe("vaultplex - Access Control Extension", () => {
   it("should deposit while using a user with access control authorization", async () => {
     const amount = new BN(LAMPORTS_PER_SOL); // Deposit 1 SOL
     
-    await depositSol(user, vaultConfig, vault, amount);
+    await depositSol(user, vaultConfig, vault, null, amount);
 
     const balance = await connection.getBalance(vault);
     assert.equal(balance, 3 * LAMPORTS_PER_SOL);

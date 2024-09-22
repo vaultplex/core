@@ -17,8 +17,8 @@ declare_id!("9a8aV7w4h7xpoFKnCuXvwef3pXexBbeJBUmMh79sQ5xb");
 pub mod vaultplex {
     use super::*;
 
-    pub fn initialize_vault(ctx: Context<InitializeVault>, seed: u64, /* , vault_type: VaultType */) -> Result<()> {
-        ctx.accounts.initialize_vault(seed, /* vault_type,  */&ctx.bumps)
+    pub fn initialize_vault(ctx: Context<InitializeVault>, seed: u64) -> Result<()> {
+        ctx.accounts.initialize_vault(seed, &ctx.bumps)
         
     }
 
@@ -42,28 +42,11 @@ pub mod vaultplex {
         ctx.accounts.initialize_deposit_period_extension(start_slot, end_slot)
     }
 
-
     pub fn initialize_access_control_extension(ctx: Context<InitializeAccessControlExtension>, access_control_authority: Pubkey, access_control_type: AccessControlType) -> Result<()> {
         ctx.accounts.initialize_access_control_extension(access_control_authority, access_control_type)
     }
 
-   /*  pub fn initialize_lock_extension(ctx: Context<InitializeLockExtension>, lock_authority: Pubkey) -> Result<()> {
-        instructions::initialize_lock_extension::initialize_lock_extension(ctx, lock_authority)
+    pub fn initialize_fee_extension(ctx: Context<InitializeFeeExtension>, fee_authority: Pubkey, fee_collector: Pubkey, deposit_fee_basis_points: u16, max_deposit_fee: u64) -> Result<()> {
+        ctx.accounts.initialize_fee_extension(fee_authority, fee_collector, deposit_fee_basis_points, max_deposit_fee, &ctx.bumps)
     }
-
-    pub fn initialize_time_interval_extension(ctx: Context<InitializeTimeIntervalExtension>, start_slot: u64, end_slot: u64) -> Result<()> {
-        instructions::initialize_time_interval_extension::initialize_time_interval_extension(ctx, start_slot, end_slot)
-    }
-
-    pub fn deposit(ctx: Context<Deposit>, seed: u64, amount: u64) -> Result<()> {
-        instructions::deposit::deposit(ctx, seed, amount)
-    }
-
-    pub fn lock_vault(ctx: Context<LockVault>) -> Result<()> {
-        instructions::lock_vault::lock(ctx)
-    }
-
-    pub fn unlock_vault(ctx: Context<LockVault>) -> Result<()> {
-        instructions::lock_vault::unlock(ctx)
-    } */
 }
