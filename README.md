@@ -6,6 +6,9 @@ Vaultplex is an open-source protocol designed to create, manage, and customize t
 ## Overview
 Vaultplex simplifies the process of managing digital assets by allowing users to create tokenized vaults that can be enhanced with powerful extensions. These extensions are designed to improve usability, accessibility, and security, ensuring a robust and versatile platform for all types of users—from individual investors to advanced DeFi developers.
 
+## Devnet Program ID
+`GzzSVgMowPhr39MUxLb9yA1cncfmjREHrrGEEvawbKK9`
+
 ## Key Features
 
 ### Tokenized Vaults: 
